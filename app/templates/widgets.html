@@ -13,6 +13,28 @@
   <button type="submit" class="action">执行批次</button>
 </form>
 {% endmacro %}
+{% macro release(p) %}
+<section class="panel release" id="release-panel" aria-labelledby="release-title" hidden>
+  <div class="panel-head"><h2 id="release-title">回收演练</h2><span id="release-summary"></span></div>
+  <div class="kpis release-kpis" aria-label="回收容量">
+    {% for key, text in [('bytes','将释放容量'), ('objects','可回收对象'), ('retained','留存对象')] %}
+    <div class="metric"><span>{{ text }}</span><strong data-release="{{ key }}">—</strong></div>
+    {% endfor %}
+  </div>
+  <p class="release-note" id="release-note" role="status" aria-live="polite"></p>
+  <div class="scroll"><table id="release-rows" aria-label="回收与留存对象"></table></div>
+  <p class="release-note" id="release-quarantine"></p>
+  <div class="release-decision">
+    <h3>执行选择</h3>
+    <p class="basis">演练只给出选项，不会自动删除；由值班工程师决定先释放还是等齐。</p>
+    <div id="release-options" role="group" aria-label="执行选择"></div>
+  </div>
+  <div class="release-checks">
+    <h3>执行前对账</h3>
+    <ul id="release-checks" aria-label="源行、保留行、可回收行和隔离行对账"></ul>
+  </div>
+</section>
+{% endmacro %}
 {% macro metrics() %}
 <div class="kpis" aria-label="输入统计">
   {% for key, text in [('input','输入行'), ('accepted','采信行'), ('isolated','隔离行'), ('cases','业务组')] %}
@@ -37,7 +59,11 @@
   <form id="review" hidden>
     <p id="run-status"></p><label for="note">复核意见</label>
     <textarea id="note" name="note" minlength="3" maxlength="200" required></textarea>
-    <div class="review-actions"><button name="decision" value="HELD">暂缓</button><button class="action" name="decision" value="APPROVED">签发</button></div>
+    <div class="review-actions">
+      <button name="decision" value="HELD">暂缓</button>
+      <button name="decision" value="PARTIAL">先释放已确认安全的对象</button>
+      <button class="action" name="decision" value="APPROVED">整批签发</button>
+    </div>
     <a id="evidence">下载复核证据</a>
   </form>
 </aside>

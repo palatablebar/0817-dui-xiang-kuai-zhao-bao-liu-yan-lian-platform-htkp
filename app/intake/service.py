@@ -10,6 +10,7 @@ from app.intake.schema import HEADER, record
 def inspect(data):
     counted = repeated = blanks = 0
     candidates, rejected = [], []
+    lines = {}
     try:
         for line, values in records(data):
             counted += 1
@@ -20,13 +21,16 @@ def inspect(data):
                 repeated += 1
                 continue
             try:
-                candidates.append((line, record(values)))
+                row = record(values)
             except DomainIssue as error:
                 key = values[0][:36] if values else ""
                 case = values[1][:36] if len(values) > 1 else ""
                 rejected.append(
                     dict(line=line, record=key, case=case, reason=error.code)
                 )
+            else:
+                candidates.append((line, row))
+                lines.setdefault(row["record"], line)
     except Error as error:
         raise DomainIssue("CSV_MALFORMED") from error
     accepted, conflicts = partition(candidates)
@@ -39,5 +43,6 @@ def inspect(data):
         rejected=len(rejects),
         reasons=dict(Counter(r["reason"] for r in rejects)),
         isolation=rejects,
+        positions={row["record"]: lines[row["record"]] for row in accepted},
         rows=accepted,
     )

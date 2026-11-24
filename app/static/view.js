@@ -1,6 +1,6 @@
 import {element, pretty} from './client.js';
 
-const labels = {READY:'通过', MISMATCH:'差异待复核', PENDING:'待复核', APPROVED:'已签发', HELD:'已暂缓'};
+const labels = {READY:'通过', MISMATCH:'差异待复核', PENDING:'待复核', APPROVED:'已整批签发', PARTIAL:'已先释放安全对象', HELD:'已暂缓'};
 const headers = ['业务分组', '输入行', '计算值', '参考值', '判定'];
 
 export function badge(status) {
